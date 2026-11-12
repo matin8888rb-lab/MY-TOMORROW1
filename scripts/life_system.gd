@@ -44,10 +44,12 @@ func eat_meal() -> void:
 	life_changed.emit()
 
 func sleep_for_night() -> void:
-	minutes_of_day = (minutes_of_day + 480) % 1440
-	if minutes_of_day < STARTING_MINUTES:
-		day_number += 1
-		rent_due_in_days = maxi(0, rent_due_in_days - 1)
+	var new_total_minutes := minutes_of_day + 480
+	var days_passed := int(new_total_minutes / 1440)
+	minutes_of_day = new_total_minutes % 1440
+	if days_passed > 0:
+		day_number += days_passed
+		rent_due_in_days = maxi(0, rent_due_in_days - days_passed)
 	energy = 100.0
 	hunger = maxf(0.0, hunger - 12.0)
 	save_state()
