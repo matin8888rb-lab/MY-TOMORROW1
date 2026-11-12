@@ -156,6 +156,14 @@ func _build_ui() -> void:
 	_add_activity_button(activity_column, "کتاب‌خوانی", "reading")
 	_add_activity_button(activity_column, "پیاده‌روی در شهر", "walking")
 	_add_activity_button(activity_column, "نقاشی آزاد", "painting")
+	var cooking_game_button := Button.new()
+	cooking_game_button.text = "مینی‌گیم آشپزی"
+	cooking_game_button.pressed.connect(func(): _start_minigame("cooking"))
+	activity_column.add_child(cooking_game_button)
+	var color_game_button := Button.new()
+	color_game_button.text = "مینی‌گیم ترتیب رنگ‌ها"
+	color_game_button.pressed.connect(func(): _start_minigame("painting"))
+	activity_column.add_child(color_game_button)
 	var event_button := Button.new()
 	event_button.text = "شرکت در رویداد محله £5"
 	event_button.pressed.connect(_on_city_event_pressed)
