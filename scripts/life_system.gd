@@ -37,6 +37,11 @@ func _advance_minute() -> void:
 	energy = maxf(0.0, energy - 0.018)
 	life_changed.emit()
 
+func advance_time(minutes: int) -> void:
+	for _minute in range(maxi(0, minutes)):
+		_advance_minute()
+	save_state()
+
 func eat_meal() -> void:
 	hunger = minf(100.0, hunger + 38.0)
 	energy = minf(100.0, energy + 3.0)
