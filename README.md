@@ -9,6 +9,8 @@ A Godot 4 project for an offline, landscape Android life simulator set in London
 - `scripts/main.gd` — procedural environment, city block, camera, HUD and input.
 - `scripts/player.gd` — CharacterBody3D player controller and capsule collision.
 - `scripts/virtual_joystick.gd` — on-screen movement joystick.
+- `scripts/profile_manager.gd` — local profile save/load with Godot ConfigFile.
+- `scripts/character_creator.gd` — Persian character creation and appearance options.
 
 ## Controls
 
@@ -21,6 +23,12 @@ A Godot 4 project for an offline, landscape Android life simulator set in London
 1. Install Godot 4.x.
 2. Open this repository folder in Godot using **Import**.
 3. Run the project (F6/F5 or the Play button).
+
+## Stage 2 scope
+
+The project now includes a Persian character creator with first name, family name, skin tone, hair color, hair style and outfit color options. Player profile data is stored locally in user://player_profile.cfg; a saved profile can be continued on the next launch or edited from the HUD. The player model applies the selected colors and hair style at runtime.
+
+See docs/STAGE_2_TEST_PLAN.md for the acceptance checklist. These features are source-implemented but have not yet been run in the Godot editor or on an Android device.
 
 ## Stage 1 scope
 
