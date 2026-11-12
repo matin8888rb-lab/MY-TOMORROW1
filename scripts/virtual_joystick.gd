@@ -4,7 +4,7 @@ class_name VirtualJoystick
 signal vector_changed(value: Vector2)
 
 @export var deadzone: float = 0.12
-@export var knob_limit: float = 58.0
+@export var knob_limit: float = 68.0
 
 var _touch_index: int = -1
 var _vector: Vector2 = Vector2.ZERO
@@ -14,7 +14,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_center = size * 0.5
 	if size == Vector2.ZERO:
-		size = Vector2(180.0, 180.0)
+		size = Vector2(196.0, 196.0)
 		_center = size * 0.5
 	queue_redraw()
 
@@ -27,14 +27,14 @@ func _gui_input(event: InputEvent) -> void:
 	if event is InputEventScreenTouch:
 		if event.pressed and _touch_index == -1:
 			_touch_index = event.index
-			_update_from_position(event.position - global_position)
+			_update_from_position(event.position)
 			accept_event()
 		elif not event.pressed and event.index == _touch_index:
 			_touch_index = -1
 			_set_vector(Vector2.ZERO)
 			accept_event()
 	elif event is InputEventScreenDrag and event.index == _touch_index:
-		_update_from_position(event.position - global_position)
+		_update_from_position(event.position)
 		accept_event()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if event.pressed and _touch_index == -1:
