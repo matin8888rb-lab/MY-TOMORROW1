@@ -3,6 +3,8 @@ extends Node3D
 const PlayerScript = preload("res://scripts/player.gd")
 const JoystickScript = preload("res://scripts/virtual_joystick.gd")
 const CharacterCreatorScript = preload("res://scripts/character_creator.gd")
+const HomeWorldScript = preload("res://scripts/home_world.gd")
+const LifeHUDScript = preload("res://scripts/life_hud.gd")
 
 var player: CharacterBody3D
 var camera_pivot: Node3D
@@ -10,6 +12,9 @@ var camera: Camera3D
 var joystick: Control
 var hud_label: Label
 var hint_label: Label
+var time_label: Label
+var home_world: Node3D
+var life_hud: CanvasLayer
 var look_touch_id: int = -1
 var look_last_position: Vector2 = Vector2.ZERO
 var camera_pitch: float = -0.16
@@ -22,12 +27,15 @@ func _ready() -> void:
 	_create_player()
 	_create_camera()
 	_create_hud()
+	_create_home_and_life_ui()
 	_create_input_actions()
 	_open_character_creator()
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(player) and is_instance_valid(hud_label):
 		hud_label.text = "%s  •  لندن ۲۰۱۸     |     موقعیت: %.0f ، %.0f" % [player_display_name, player.global_position.x, player.global_position.z]
+	if is_instance_valid(time_label):
+		time_label.text = "روز %d  |  %s" % [LifeSystem.day_number, LifeSystem.get_clock_text()]
 
 func _setup_environment() -> void:
 	var world_environment := WorldEnvironment.new()
@@ -195,7 +203,7 @@ func _create_hud() -> void:
 	hint_label.add_theme_color_override("font_color", Color(0.92, 0.91, 0.82))
 	root.add_child(hint_label)
 
-	var time_label := Label.new()
+	time_label = Label.new()
 	time_label.text = "روز اول  |  ۰۸:۰۰"
 	time_label.position = Vector2(1010.0, 24.0)
 	time_label.add_theme_font_size_override("font_size", 20)
@@ -225,6 +233,43 @@ func _create_hud() -> void:
 	edit_character_button.custom_minimum_size = Vector2(190.0, 42.0)
 	edit_character_button.pressed.connect(_open_character_creator)
 	root.add_child(edit_character_button)
+
+func _create_home_and_life_ui() -> void:
+	home_world = HomeWorldScript.new()
+	home_world.name = "StarterApartment"
+	add_child(home_world)
+	life_hud = LifeHUDScript.new()
+	life_hud.name = "LifeHUD"
+	life_hud.home_button_pressed.connect(_on_home_button_pressed)
+	life_hud.eat_button_pressed.connect(_on_eat_button_pressed)
+	life_hud.sleep_button_pressed.connect(_on_sleep_button_pressed)
+	add_child(life_hud)
+
+func _on_home_button_pressed() -> void:
+	if not is_instance_valid(home_world) or not is_instance_valid(player):
+		return
+	if home_world.is_inside:
+		home_world.leave_home(player)
+		life_hud.set_home_state(false)
+		life_hud.show_message("از خانه خارج شدی.")
+	else:
+		home_world.enter_home(player)
+		life_hud.set_home_state(true)
+		life_hud.show_message("به خانه اجاره‌ای خودت خوش آمدی.")
+
+func _on_eat_button_pressed() -> void:
+	if not is_instance_valid(home_world) or not home_world.is_inside:
+		life_hud.show_message("برای غذا خوردن باید داخل خانه باشی.")
+		return
+	LifeSystem.eat_meal()
+	life_hud.show_message("یک وعده غذا خوردی؛ گرسنگی کمتر شد.")
+
+func _on_sleep_button_pressed() -> void:
+	if not is_instance_valid(home_world) or not home_world.is_inside:
+		life_hud.show_message("برای خوابیدن باید به خانه برگردی.")
+		return
+	LifeSystem.sleep_for_night()
+	life_hud.show_message("استراحت کردی و انرژی‌ات بازیابی شد.")
 
 func _open_character_creator() -> void:
 	if is_instance_valid(character_creator):
