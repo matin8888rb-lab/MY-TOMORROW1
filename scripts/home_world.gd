@@ -7,6 +7,26 @@ var is_inside: bool = false
 
 func _ready() -> void:
 	_build_apartment()
+	LifestyleSystem.home_upgrade_purchased.connect(_on_home_upgrade_purchased)
+	for upgrade_id in LifestyleSystem.owned_upgrades:
+		_apply_home_upgrade(upgrade_id)
+
+func _on_home_upgrade_purchased(upgrade_id: String) -> void:
+	_apply_home_upgrade(upgrade_id)
+
+func _apply_home_upgrade(upgrade_id: String) -> void:
+	match upgrade_id:
+		"lamp":
+			_add_box("چراغ ایستاده", Vector3(24.0, 1.25, 17.2), Vector3(0.32, 2.5, 0.32), Color(0.88, 0.72, 0.38), false)
+			_add_box("سرچراغ", Vector3(24.0, 2.45, 17.2), Vector3(0.72, 0.18, 0.72), Color(1.0, 0.88, 0.58), false)
+		"bookshelf":
+			_add_box("قفسه کتاب", Vector3(15.8, 1.15, 22.2), Vector3(0.55, 2.3, 2.2), Color(0.30, 0.20, 0.13), false)
+			for shelf_index in range(4):
+				var book_colors: Array[Color] = [Color(0.55, 0.20, 0.16), Color(0.18, 0.34, 0.48), Color(0.72, 0.55, 0.22), Color(0.24, 0.42, 0.30)]
+				_add_box("کتاب قفسه", Vector3(15.48, 0.45 + float(shelf_index) * 0.48, 22.2), Vector3(0.12, 0.32, 1.65), book_colors[shelf_index], false)
+		"plant":
+			_add_box("گلدان", Vector3(24.0, 0.35, 23.2), Vector3(0.7, 0.7, 0.7), Color(0.58, 0.30, 0.20), false)
+			_add_box("گیاه آپارتمانی", Vector3(24.0, 1.05, 23.2), Vector3(0.25, 1.1, 0.25), Color(0.20, 0.48, 0.25), false)
 
 func enter_home(player: CharacterBody3D) -> void:
 	if not is_inside:
