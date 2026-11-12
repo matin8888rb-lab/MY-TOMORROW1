@@ -1,39 +1,27 @@
-# MY TOMORROW — Stage 1 Foundation
+# MY TOMORROW
 
-A Godot 4 project for an offline, landscape Android life simulator set in London in 2018. The first stage establishes a small procedural city block, third-person movement, a follow camera, and Persian-first touch HUD.
+پروژه Godot 4 برای ساخت یک شبیه‌ساز زندگی سه‌بعدی آفلاین و افقی روی Android؛ داستان در لندن سال ۲۰۱۸ جریان دارد.
 
-## Project structure
+## ساختار فعلی
+- `project.godot`: تنظیمات پروژه و Autoloadهای پروفایل و وضعیت زندگی
+- `scenes/main.tscn`: صحنه اصلی
+- `scripts/main.gd`: شهر، دوربین، ورودی‌ها و اتصال سیستم‌ها
+- `scripts/player.gd`: کنترلر سوم‌شخص و ظاهر شخصیت
+- `scripts/virtual_joystick.gd`: جوی‌استیک لمسی
+- `scripts/profile_manager.gd` و `scripts/character_creator.gd`: ساخت و ذخیره شخصیت
+- `scripts/home_world.gd`: آپارتمان اجاره‌ای آغاز بازی
+- `scripts/life_system.gd`: ساعت، نیازها و ذخیره وضعیت روزمره
+- `scripts/life_hud.gd`: رابط وضعیت زندگی و دکمه‌های خانه، غذا و خواب
 
-- `project.godot` — project configuration (Godot 4, landscape, mobile renderer).
-- `scenes/main.tscn` — main scene.
-- `scripts/main.gd` — procedural environment, city block, camera, HUD and input.
-- `scripts/player.gd` — CharacterBody3D player controller and capsule collision.
-- `scripts/virtual_joystick.gd` — on-screen movement joystick.
-- `scripts/profile_manager.gd` — local profile save/load with Godot ConfigFile.
-- `scripts/character_creator.gd` — Persian character creation and appearance options.
+## کنترل‌ها
+- Android: جوی‌استیک پایین سمت چپ برای حرکت و کشیدن سمت راست برای چرخاندن دوربین.
+- پیش‌نمایش دسکتاپ: کلیدهای WASD و نگه‌داشتن دکمه راست ماوس برای چرخش دوربین.
 
-## Controls
+## اجرای پروژه
+پوشه مخزن را با Godot 4.x وارد و صحنه اصلی را اجرا کنید.
 
-- Android: drag the virtual joystick at bottom-left to walk; drag on the right side to rotate the camera.
-- Desktop preview: WASD to walk; hold right mouse button and drag to rotate the camera.
-- Escape closes the preview.
+## وضعیت توسعه
+مرحله‌های ۱ تا ۳ در سطح کدنویسی اولیه در مخزن قرار دارند. شخصیت‌سازی، خانه و چرخه روزمره هنوز در Godot یا دستگاه Android تأیید نشده‌اند. هیچ APK ساخته یا آزمایش نشده است. برای جزئیات آزمون‌ها به `docs/STAGE_2_TEST_PLAN.md` و `docs/STAGE_3_TEST_PLAN.md` مراجعه کنید.
 
-## Run
-
-1. Install Godot 4.x.
-2. Open this repository folder in Godot using **Import**.
-3. Run the project (F6/F5 or the Play button).
-
-## Stage 2 scope
-
-The project now includes a Persian character creator with first name, family name, skin tone, hair color, hair style and outfit color options. Player profile data is stored locally in user://player_profile.cfg; a saved profile can be continued on the next launch or edited from the HUD. The player model applies the selected colors and hair style at runtime.
-
-See docs/STAGE_2_TEST_PLAN.md for the acceptance checklist. These features are source-implemented but have not yet been run in the Godot editor or on an Android device.
-
-## Stage 1 scope
-
-This is the foundation slice, not the full life simulator. It currently aims to provide a small walkable street with simple procedural buildings, pavements, lamps, trees, a player capsule, and camera/touch controls. Jobs, home interiors, needs, economy, NPC routines, transit simulation and story systems are later stages.
-
-## Verification status
-
-The source files have been added to the repository, but this environment has not run the project in the Godot editor or on an Android device. No APK has been built or tested yet. The scene, GDScript parsing, touch behavior, and mobile performance remain unverified until opened and run with Godot 4.x.
+## محدودیت‌های مرحله ۳
+غذا خوردن فعلاً بدون خرید و پرداخت انجام می‌شود و اجاره به شکل شمارش معکوس هفت‌روزه نمایش داده می‌شود. کیف پول، خرید مواد غذایی و پرداخت واقعی اجاره در مرحله ۴ پیاده‌سازی می‌شوند.
