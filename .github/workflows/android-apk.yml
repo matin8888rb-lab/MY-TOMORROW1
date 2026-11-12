@@ -100,8 +100,9 @@ jobs:
       - name: Verify APK package
         run: |
           test -s build/MY_TOMORROW-debug.apk
-          file build/MY_TOMORROW-debug.apk
+          ls -lh build/MY_TOMORROW-debug.apk
           unzip -t build/MY_TOMORROW-debug.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose build/MY_TOMORROW-debug.apk
           sha256sum build/MY_TOMORROW-debug.apk
 
       - name: Upload APK artifact
