@@ -23,6 +23,7 @@ var look_last_position: Vector2 = Vector2.ZERO
 var camera_pitch: float = -0.16
 var character_creator: CanvasLayer
 var player_display_name: String = "بازیکن"
+var exit_dialog: ConfirmationDialog
 
 func _ready() -> void:
 	_setup_environment()
@@ -34,6 +35,7 @@ func _ready() -> void:
 	_create_home_and_life_ui()
 	_create_input_actions()
 	_open_character_creator()
+	_create_exit_dialog()
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(player) and is_instance_valid(hud_label):
@@ -447,6 +449,26 @@ func _on_profile_confirmed(profile: Dictionary) -> void:
 		hud_label.text = "%s  •  لندن ۲۰۱۸" % player_display_name
 	character_creator = null
 
+func _create_exit_dialog() -> void:
+	exit_dialog = ConfirmationDialog.new()
+	exit_dialog.title = "خروج از بازی"
+	exit_dialog.dialog_text = "می‌خواهی از MY TOMORROW خارج شوی؟"
+	exit_dialog.ok_button_text = "خروج از بازی"
+	exit_dialog.cancel_button_text = "ادامه بازی"
+	exit_dialog.confirmed.connect(_confirm_exit)
+	add_child(exit_dialog)
+
+func _show_exit_confirmation() -> void:
+	if is_instance_valid(exit_dialog) and not exit_dialog.visible:
+		exit_dialog.popup_centered(Vector2i(440, 180))
+
+func _confirm_exit() -> void:
+	get_tree().quit()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_GO_BACK_REQUEST:
+		_show_exit_confirmation()
+
 func _create_input_actions() -> void:
 	_add_key_action("move_forward", KEY_W)
 	_add_key_action("move_back", KEY_S)
@@ -482,7 +504,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and look_touch_id == -2:
 		_apply_camera_drag(event.relative)
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
-		get_tree().quit()
+		_show_exit_confirmation()
 
 func _apply_camera_drag(delta_position: Vector2) -> void:
 	if not is_instance_valid(camera_pivot):
