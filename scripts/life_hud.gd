@@ -41,8 +41,8 @@ func _ready() -> void:
 
 func _build_ui() -> void:
 	var panel := PanelContainer.new()
-	panel.position = Vector2(22.0, 116.0)
-	panel.custom_minimum_size = Vector2(300.0, 132.0)
+	panel.position = Vector2(22.0, 96.0)
+	panel.custom_minimum_size = Vector2(260.0, 118.0)
 	var style := StyleBoxFlat.new()
 	style.bg_color = Color(0.035, 0.075, 0.09, 0.86)
 	style.set_corner_radius_all(10)
@@ -123,7 +123,11 @@ func _build_ui() -> void:
 	column.add_child(rent_button)
 
 	dialogue_panel = PanelContainer.new()
-	dialogue_panel.position = Vector2(360.0, 350.0)
+	dialogue_panel.set_anchors_preset(Control.PRESET_CENTER)
+	dialogue_panel.offset_left = -260.0
+	dialogue_panel.offset_top = -120.0
+	dialogue_panel.offset_right = 260.0
+	dialogue_panel.offset_bottom = 120.0
 	dialogue_panel.custom_minimum_size = Vector2(560.0, 240.0)
 	dialogue_panel.visible = false
 	add_child(dialogue_panel)
@@ -145,8 +149,12 @@ func _build_ui() -> void:
 
 
 	var activity_panel := PanelContainer.new()
-	activity_panel.position = Vector2(960.0, 145.0)
-	activity_panel.custom_minimum_size = Vector2(290.0, 360.0)
+	activity_panel.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	activity_panel.offset_left = -250.0
+	activity_panel.offset_top = 105.0
+	activity_panel.offset_right = -16.0
+	activity_panel.offset_bottom = 465.0
+	activity_panel.custom_minimum_size = Vector2(234.0, 340.0)
 	var activity_column := VBoxContainer.new()
 	activity_panel.add_child(activity_column)
 	var activity_title := Label.new()
@@ -177,7 +185,11 @@ func _build_ui() -> void:
 	add_child(activity_panel)
 
 	minigame_panel = PanelContainer.new()
-	minigame_panel.position = Vector2(420.0, 170.0)
+	minigame_panel.set_anchors_preset(Control.PRESET_CENTER)
+	minigame_panel.offset_left = -210.0
+	minigame_panel.offset_top = -130.0
+	minigame_panel.offset_right = 210.0
+	minigame_panel.offset_bottom = 130.0
 	minigame_panel.custom_minimum_size = Vector2(420.0, 260.0)
 	minigame_panel.visible = false
 	add_child(minigame_panel)
@@ -207,7 +219,11 @@ func _build_ui() -> void:
 	mini_column.add_child(close_mini)
 
 	message_label = Label.new()
-	message_label.position = Vector2(22.0, 258.0)
+	message_label.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	message_label.offset_left = 250.0
+	message_label.offset_top = -92.0
+	message_label.offset_right = -250.0
+	message_label.offset_bottom = -52.0
 	message_label.add_theme_font_size_override("font_size", 15)
 	message_label.add_theme_color_override("font_color", Color(0.98, 0.88, 0.62))
 	add_child(message_label)
