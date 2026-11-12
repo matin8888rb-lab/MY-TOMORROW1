@@ -81,7 +81,7 @@ jobs:
           GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD: android
         run: |
           mkdir -p build
-          godot --headless --path . --export-debug "Android" build/MY_TOMORROW-debug.apk
+          godot --headless --verbose --path . --export-debug "Android" build/MY_TOMORROW-debug.apk
 
       - name: Verify APK package
         run: |
