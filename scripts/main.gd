@@ -5,6 +5,7 @@ const JoystickScript = preload("res://scripts/virtual_joystick.gd")
 const CharacterCreatorScript = preload("res://scripts/character_creator.gd")
 const HomeWorldScript = preload("res://scripts/home_world.gd")
 const LifeHUDScript = preload("res://scripts/life_hud.gd")
+const CityLifeScript = preload("res://scripts/city_life.gd")
 
 var player: CharacterBody3D
 var camera_pivot: Node3D
@@ -16,6 +17,7 @@ var hint_label: Label
 var time_label: Label
 var home_world: HomeWorld
 var life_hud: LifeHUD
+var city_life: CityLifeSystem
 var look_touch_id: int = -1
 var look_last_position: Vector2 = Vector2.ZERO
 var camera_pitch: float = -0.16
@@ -26,6 +28,7 @@ func _ready() -> void:
 	_setup_environment()
 	_build_city_block()
 	_create_player()
+	_create_city_life()
 	_create_camera()
 	_create_hud()
 	_create_home_and_life_ui()
@@ -156,6 +159,12 @@ func _create_player() -> void:
 	player.position = Vector3(0.0, 0.12, 20.0)
 	add_child(player)
 
+func _create_city_life() -> void:
+	city_life = CityLifeScript.new()
+	city_life.name = "CityLife"
+	add_child(city_life)
+	city_life.setup(player)
+
 func _create_camera() -> void:
 	camera_pivot = Node3D.new()
 	camera_pivot.name = "CameraPivot"
@@ -262,6 +271,7 @@ func _create_home_and_life_ui() -> void:
 	life_hud.shop_button_pressed.connect(_on_shop_button_pressed)
 	life_hud.work_button_pressed.connect(_on_work_button_pressed)
 	life_hud.rent_button_pressed.connect(_on_rent_button_pressed)
+	life_hud.transport_button_pressed.connect(_on_transport_button_pressed)
 	add_child(life_hud)
 
 func _on_home_button_pressed() -> void:
@@ -291,6 +301,11 @@ func _on_work_button_pressed() -> void:
 
 func _on_rent_button_pressed() -> void:
 	life_hud.show_message(EconomySystem.pay_rent())
+
+func _on_transport_button_pressed() -> void:
+	if not is_instance_valid(city_life):
+		return
+	life_hud.show_message(city_life.take_bus(player))
 
 func _on_eat_button_pressed() -> void:
 	if not is_instance_valid(home_world) or not home_world.is_inside:
