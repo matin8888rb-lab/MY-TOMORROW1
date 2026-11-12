@@ -272,6 +272,9 @@ func _create_home_and_life_ui() -> void:
 	life_hud.work_button_pressed.connect(_on_work_button_pressed)
 	life_hud.rent_button_pressed.connect(_on_rent_button_pressed)
 	life_hud.transport_button_pressed.connect(_on_transport_button_pressed)
+	life_hud.talk_button_pressed.connect(_on_talk_button_pressed)
+	life_hud.dialogue_choice_pressed.connect(_on_dialogue_choice_pressed)
+	SocialStory.dialogue_changed.connect(life_hud.show_dialogue)
 	add_child(life_hud)
 
 func _on_home_button_pressed() -> void:
@@ -301,6 +304,18 @@ func _on_work_button_pressed() -> void:
 
 func _on_rent_button_pressed() -> void:
 	life_hud.show_message(EconomySystem.pay_rent())
+
+func _on_talk_button_pressed() -> void:
+	if not is_instance_valid(city_life) or not is_instance_valid(player):
+		return
+	var person_id := city_life.get_nearest_person(player)
+	if person_id < 0:
+		life_hud.show_message("برای گفت‌وگو باید به یکی از ساکنان نزدیک شوی.")
+		return
+	life_hud.show_message(SocialStory.begin_conversation(person_id))
+
+func _on_dialogue_choice_pressed(choice_index: int) -> void:
+	SocialStory.choose_dialogue(choice_index)
 
 func _on_transport_button_pressed() -> void:
 	if not is_instance_valid(city_life):
