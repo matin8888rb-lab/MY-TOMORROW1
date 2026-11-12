@@ -33,12 +33,28 @@ func enter_home(player: CharacterBody3D) -> void:
 		player.velocity = Vector3.ZERO
 		player.global_position = HOME_CENTER + Vector3(0.0, 0.12, 0.0)
 		is_inside = true
+		_set_interior_visibility(true)
+		var pivot := player.get_node_or_null("CameraPivot") as Node3D
+		if is_instance_valid(pivot):
+			pivot.position = Vector3(0.0, 1.55, 0.0)
+			pivot.rotation = Vector3(-0.12, 0.0, 0.0)
 
 func leave_home(player: CharacterBody3D) -> void:
 	if is_inside:
 		player.velocity = Vector3.ZERO
 		player.global_position = ENTRY_POSITION
 		is_inside = false
+		_set_interior_visibility(false)
+		var pivot := player.get_node_or_null("CameraPivot") as Node3D
+		if is_instance_valid(pivot):
+			pivot.position = Vector3(0.0, 1.5, 0.0)
+			pivot.rotation = Vector3(-0.16, 0.0, 0.0)
+
+func _set_interior_visibility(inside: bool) -> void:
+	for node_name in ["دیوار پشتی", "دیوار چپ", "دیوار راست", "دیوار جلویی چپ", "دیوار جلویی راست"]:
+		var wall := find_child(node_name, true, false)
+		if is_instance_valid(wall):
+			wall.visible = not inside
 
 func _build_apartment() -> void:
 	_add_box("کف خانه", Vector3(20.0, -0.12, 20.0), Vector3(10.0, 0.24, 8.0), Color(0.56, 0.48, 0.37))
