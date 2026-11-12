@@ -2,6 +2,7 @@ extends Node3D
 
 const PlayerScript = preload("res://scripts/player.gd")
 const JoystickScript = preload("res://scripts/virtual_joystick.gd")
+const CharacterCreatorScript = preload("res://scripts/character_creator.gd")
 
 var player: CharacterBody3D
 var camera_pivot: Node3D
@@ -12,6 +13,8 @@ var hint_label: Label
 var look_touch_id: int = -1
 var look_last_position: Vector2 = Vector2.ZERO
 var camera_pitch: float = -0.16
+var character_creator: CanvasLayer
+var player_display_name: String = "بازیکن"
 
 func _ready() -> void:
 	_setup_environment()
@@ -20,10 +23,11 @@ func _ready() -> void:
 	_create_camera()
 	_create_hud()
 	_create_input_actions()
+	_open_character_creator()
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(player) and is_instance_valid(hud_label):
-		hud_label.text = "لندن  •  ۲۰۱۸     |     موقعیت: %.0f ، %.0f" % [player.global_position.x, player.global_position.z]
+		hud_label.text = "%s  •  لندن ۲۰۱۸     |     موقعیت: %.0f ، %.0f" % [player_display_name, player.global_position.x, player.global_position.z]
 
 func _setup_environment() -> void:
 	var world_environment := WorldEnvironment.new()
@@ -214,6 +218,29 @@ func _create_hud() -> void:
 	look_hint.add_theme_font_size_override("font_size", 14)
 	look_hint.add_theme_color_override("font_color", Color(0.95, 0.95, 0.90, 0.8))
 	root.add_child(look_hint)
+
+	var edit_character_button := Button.new()
+	edit_character_button.text = "ویرایش شخصیت"
+	edit_character_button.position = Vector2(1060.0, 78.0)
+	edit_character_button.custom_minimum_size = Vector2(190.0, 42.0)
+	edit_character_button.pressed.connect(_open_character_creator)
+	root.add_child(edit_character_button)
+
+func _open_character_creator() -> void:
+	if is_instance_valid(character_creator):
+		return
+	character_creator = CharacterCreatorScript.new()
+	character_creator.name = "CharacterCreator"
+	character_creator.profile_confirmed.connect(_on_profile_confirmed)
+	add_child(character_creator)
+
+func _on_profile_confirmed(profile: Dictionary) -> void:
+	if is_instance_valid(player):
+		player.apply_profile(profile)
+	player_display_name = "%s %s" % [str(profile.get("first_name", "")), str(profile.get("last_name", ""))]
+	if is_instance_valid(hud_label):
+		hud_label.text = "%s  •  لندن ۲۰۱۸" % player_display_name
+	character_creator = null
 
 func _create_input_actions() -> void:
 	_add_key_action("move_forward", KEY_W)
