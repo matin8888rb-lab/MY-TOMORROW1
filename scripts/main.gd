@@ -259,6 +259,9 @@ func _create_home_and_life_ui() -> void:
 	life_hud.home_button_pressed.connect(_on_home_button_pressed)
 	life_hud.eat_button_pressed.connect(_on_eat_button_pressed)
 	life_hud.sleep_button_pressed.connect(_on_sleep_button_pressed)
+	life_hud.shop_button_pressed.connect(_on_shop_button_pressed)
+	life_hud.work_button_pressed.connect(_on_work_button_pressed)
+	life_hud.rent_button_pressed.connect(_on_rent_button_pressed)
 	add_child(life_hud)
 
 func _on_home_button_pressed() -> void:
@@ -273,19 +276,27 @@ func _on_home_button_pressed() -> void:
 		life_hud.set_home_state(true)
 		life_hud.show_message("به خانه اجاره‌ای خودت خوش آمدی.")
 
-func _on_eat_button_pressed() -> void:
-	if not is_instance_valid(home_world) or not home_world.is_inside:
-		life_hud.show_message("برای غذا خوردن باید داخل خانه باشی.")
-		return
-	LifeSystem.eat_meal()
-	life_hud.show_message("یک وعده غذا خوردی؛ گرسنگی کمتر شد.")
-
 func _on_sleep_button_pressed() -> void:
 	if not is_instance_valid(home_world) or not home_world.is_inside:
 		life_hud.show_message("برای خوابیدن باید به خانه برگردی.")
 		return
 	LifeSystem.sleep_for_night()
 	life_hud.show_message("استراحت کردی و انرژی‌ات بازیابی شد.")
+
+func _on_shop_button_pressed() -> void:
+	life_hud.show_message(EconomySystem.buy_food())
+
+func _on_work_button_pressed() -> void:
+	life_hud.show_message(EconomySystem.work_shift())
+
+func _on_rent_button_pressed() -> void:
+	life_hud.show_message(EconomySystem.pay_rent())
+
+func _on_eat_button_pressed() -> void:
+	if not is_instance_valid(home_world) or not home_world.is_inside:
+		life_hud.show_message("برای غذا خوردن باید داخل خانه باشی.")
+		return
+	life_hud.show_message(EconomySystem.consume_food())
 
 func _open_character_creator() -> void:
 	if is_instance_valid(character_creator):
