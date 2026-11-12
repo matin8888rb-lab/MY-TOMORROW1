@@ -26,6 +26,7 @@ window/handheld/orientation=0
 renderer/rendering_method="mobile"
 renderer/rendering_method.mobile="mobile"
 textures/default_filters/use_nearest_mipmap_filter=false
+textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0.43, 0.62, 0.72, 1)
 
 [physics]
