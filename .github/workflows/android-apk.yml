@@ -1,0 +1,49 @@
+name: Android debug APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export-android:
+    name: Export Android APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: barichello/godot-ci:4.4.1
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify build environment
+        run: |
+          godot --version
+          java -version
+          test -d "$ANDROID_HOME"
+
+      - name: Import and validate project
+        run: godot --headless --editor --path . --quit
+
+      - name: Export debug APK
+        run: |
+          mkdir -p build
+          godot --headless --path . --export-debug "Android" build/MY_TOMORROW-debug.apk
+
+      - name: Verify APK package
+        run: |
+          test -s build/MY_TOMORROW-debug.apk
+          file build/MY_TOMORROW-debug.apk
+          unzip -t build/MY_TOMORROW-debug.apk
+          sha256sum build/MY_TOMORROW-debug.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MY-TOMORROW-Android-debug
+          path: build/MY_TOMORROW-debug.apk
+          if-no-files-found: error
+          retention-days: 14
