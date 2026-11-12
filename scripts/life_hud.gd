@@ -190,7 +190,7 @@ func _build_ui() -> void:
 	for choice in mini_choices:
 		var choice_button := Button.new()
 		choice_button.text = choice
-		choice_button.pressed.connect(_on_minigame_choice.bind(choice))
+		choice_button.pressed.connect(_on_minigame_choice_index.bind(minigame_buttons.size()))
 		mini_column.add_child(choice_button)
 		minigame_buttons.append(choice_button)
 	var close_mini := Button.new()
@@ -240,8 +240,9 @@ func _start_minigame(game_id: String) -> void:
 		for i in range(minigame_buttons.size()):
 			minigame_buttons[i].text = ["آبی", "زرد", "سبز"][i]
 
-func _on_minigame_choice(choice: String) -> void:
-	var result := LifestyleSystem.submit_minigame_step(choice)
+func _on_minigame_choice_index(index: int) -> void:
+	var choices: Array[String] = ["نان", "پنیر", "گوجه"] if LifestyleSystem.active_minigame == "cooking" else ["آبی", "زرد", "سبز"]
+	var result := LifestyleSystem.submit_minigame_step(choices[index])
 	show_message(result)
 	if LifestyleSystem.active_minigame == "":
 		minigame_panel.visible = false
