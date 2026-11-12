@@ -10,6 +10,7 @@ run/main_scene="res://scenes/main.tscn"
 [autoload]
 ProfileManager="*res://scripts/profile_manager.gd"
 LifeSystem="*res://scripts/life_system.gd"
+EconomySystem="*res://scripts/economy_system.gd"
 
 [display]
 window/size/viewport_width=1280
