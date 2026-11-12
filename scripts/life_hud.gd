@@ -21,13 +21,16 @@ var home_button: Button
 var message_label: Label
 var money_label: Label
 var economy_label: Label
+var story_label: Label
 
 func _ready() -> void:
 	_build_ui()
 	LifeSystem.life_changed.connect(update_status)
 	EconomySystem.economy_changed.connect(update_economy)
+	SocialStory.social_changed.connect(update_social_status)
 	update_status()
 	update_economy()
+	update_social_status()
 
 func _build_ui() -> void:
 	var panel := PanelContainer.new()
@@ -54,6 +57,10 @@ func _build_ui() -> void:
 	economy_label.add_theme_font_size_override("font_size", 14)
 	economy_label.add_theme_color_override("font_color", Color(0.85, 0.89, 0.85))
 	column.add_child(economy_label)
+	story_label = Label.new()
+	story_label.add_theme_font_size_override("font_size", 13)
+	story_label.add_theme_color_override("font_color", Color(0.75, 0.88, 0.82))
+	column.add_child(story_label)
 
 	home_button = Button.new()
 	home_button.text = "ورود به خانه"
@@ -151,6 +158,10 @@ func set_home_state(inside: bool) -> void:
 
 func show_message(value: String) -> void:
 	message_label.text = value
+
+func update_social_status() -> void:
+	if is_instance_valid(story_label):
+		story_label.text = SocialStory.get_quest_text() + "  |  " + SocialStory.get_relationship_summary()
 
 func update_economy() -> void:
 	if not is_instance_valid(money_label):
