@@ -7,6 +7,7 @@ signal sleep_button_pressed
 signal shop_button_pressed
 signal work_button_pressed
 signal rent_button_pressed
+signal transport_button_pressed
 
 var status_label: Label
 var home_button: Button
@@ -78,6 +79,12 @@ func _build_ui() -> void:
 	work_button.custom_minimum_size = Vector2(120.0, 38.0)
 	work_button.pressed.connect(func(): work_button_pressed.emit())
 	economy_actions.add_child(work_button)
+	var transport_button := Button.new()
+	transport_button.text = "اتوبوس £3"
+	transport_button.custom_minimum_size = Vector2(130.0, 38.0)
+	transport_button.pressed.connect(func(): transport_button_pressed.emit())
+	column.add_child(transport_button)
+
 	var rent_button := Button.new()
 	rent_button.text = "پرداخت اجاره"
 	rent_button.custom_minimum_size = Vector2(130.0, 38.0)
