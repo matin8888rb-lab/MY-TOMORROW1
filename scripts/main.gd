@@ -58,6 +58,17 @@ func _setup_environment() -> void:
 	environment.ambient_light_color = Color(0.68, 0.74, 0.78)
 	environment.ambient_light_energy = 0.65
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	environment.tonemap_exposure = 1.0
+	environment.adjustment_enabled = true
+	environment.adjustment_contrast = 1.08
+	environment.adjustment_saturation = 1.06
+	environment.fog_enabled = true
+	environment.fog_light_color = Color(0.62, 0.69, 0.72)
+	environment.fog_density = 0.0012
+	environment.fog_sky_affect = 0.12
+	environment.glow_enabled = true
+	environment.glow_intensity = 0.28
+	environment.glow_strength = 0.55
 	world_environment.environment = environment
 	add_child(world_environment)
 
@@ -65,13 +76,19 @@ func _setup_environment() -> void:
 	sun_light.rotation_degrees = Vector3(-48.0, -28.0, 0.0)
 	sun_light.light_energy = 1.15
 	sun_light.shadow_enabled = true
+	sun_light.shadow_bias = 0.035
+	sun_light.shadow_normal_bias = 1.25
+	sun_light.directional_shadow_max_distance = 110.0
 	add_child(sun_light)
 
 func _build_city_block() -> void:
 	_add_box("Ground", Vector3(0, -0.55, 0), Vector3(100, 1, 100), Color(0.29, 0.34, 0.32))
-	_add_box("Road", Vector3(0, 0.015, 0), Vector3(7.0, 0.08, 76.0), Color(0.105, 0.12, 0.13))
-	_add_box("Left pavement", Vector3(-4.45, 0.08, 0), Vector3(1.9, 0.22, 76.0), Color(0.48, 0.49, 0.45))
-	_add_box("Right pavement", Vector3(4.45, 0.08, 0), Vector3(1.9, 0.22, 76.0), Color(0.48, 0.49, 0.45))
+	var road := _add_box("Road", Vector3(0, 0.015, 0), Vector3(7.0, 0.08, 76.0), Color(0.105, 0.12, 0.13))
+	_set_box_material(road, "Road", _make_asphalt_material())
+	var left_pavement := _add_box("Left pavement", Vector3(-4.45, 0.08, 0), Vector3(1.9, 0.22, 76.0), Color(0.48, 0.49, 0.45))
+	var right_pavement := _add_box("Right pavement", Vector3(4.45, 0.08, 0), Vector3(1.9, 0.22, 76.0), Color(0.48, 0.49, 0.45))
+	_set_box_material(left_pavement, "Left pavement", _make_pavement_material())
+	_set_box_material(right_pavement, "Right pavement", _make_pavement_material())
 	_add_box("Road marking left", Vector3(-3.2, 0.07, 0), Vector3(0.10, 0.025, 76.0), Color(0.86, 0.82, 0.65), false)
 	_add_box("Road marking right", Vector3(3.2, 0.07, 0), Vector3(0.10, 0.025, 76.0), Color(0.86, 0.82, 0.65), false)
 
@@ -98,14 +115,22 @@ func _create_building(x: float, z: float, variant: int) -> void:
 	]
 	var height := 8.0 + float(variant % 3) * 1.7
 	var width := 7.0 + float(variant % 2) * 1.0
-	_add_box("London brick building", Vector3(x, height * 0.5, z), Vector3(width, height, 8.5), palettes[variant % palettes.size()])
-	var face_x := x + (3.5 if x < 0.0 else -3.5)
+	var building := _add_box("London brick building", Vector3(x, height * 0.5, z), Vector3(width, height, 8.5), palettes[variant % palettes.size()])
+	_set_box_material(building, "London brick building", _make_brick_material(palettes[variant % palettes.size()], variant))
+	var face_direction := 1.0 if x < 0.0 else -1.0
+	var face_x := x + face_direction * (width * 0.5 + 0.035)
 	for floor_index in range(1, int(height / 2.1)):
 		for window_index in range(2):
 			var wz := z - 2.1 + float(window_index) * 3.8
-			_add_box("Window", Vector3(face_x, 1.45 + float(floor_index) * 2.05, wz), Vector3(0.08, 0.95, 1.25), Color(0.18, 0.29, 0.34), false)
-	_add_box("Shopfront", Vector3(face_x, 1.0, z + 0.2), Vector3(0.10, 1.45, 3.2), Color(0.16, 0.28, 0.30), false)
-	_add_box("Awning", Vector3(face_x, 1.95, z + 0.2), Vector3(0.75, 0.16, 3.7), Color(0.62, 0.28, 0.20), false)
+			var wy := 1.45 + float(floor_index) * 2.05
+			_add_box("Stone window surround", Vector3(face_x, wy, wz), Vector3(0.16, 1.18, 1.48), Color(0.70, 0.65, 0.55), false)
+			_add_box("Window glass", Vector3(face_x + face_direction * 0.095, wy, wz), Vector3(0.055, 0.91, 1.20), Color(0.10, 0.22, 0.29), false)
+			_add_box("Window sill", Vector3(face_x + face_direction * 0.14, wy - 0.60, wz), Vector3(0.30, 0.10, 1.58), Color(0.78, 0.72, 0.62), false)
+	_add_box("Shopfront frame", Vector3(face_x, 1.0, z + 0.2), Vector3(0.18, 1.58, 3.45), Color(0.12, 0.17, 0.18), false)
+	_add_box("Shopfront glass", Vector3(face_x + face_direction * 0.11, 1.0, z + 0.2), Vector3(0.06, 1.38, 3.18), Color(0.12, 0.27, 0.31), false)
+	_add_box("Awning", Vector3(face_x + face_direction * 0.42, 1.95, z + 0.2), Vector3(0.85, 0.16, 3.7), Color(0.62, 0.25, 0.18), false)
+	_add_box("Roof cornice", Vector3(x, height + 0.12, z), Vector3(width + 0.45, 0.24, 8.85), Color(0.72, 0.66, 0.55), false)
+	_add_box("Brick base course", Vector3(x, 0.28, z), Vector3(width + 0.12, 0.42, 8.62), Color(0.34, 0.29, 0.25), false)
 
 func _create_street_lamp(x: float, z: float) -> void:
 	_add_box("Lamp post", Vector3(x, 2.0, z), Vector3(0.09, 4.0, 0.09), Color(0.12, 0.16, 0.16), false)
@@ -113,17 +138,19 @@ func _create_street_lamp(x: float, z: float) -> void:
 
 func _create_tree(position: Vector3) -> void:
 	var trunk := _add_box("Tree trunk", position + Vector3(0, 1.1, 0), Vector3(0.28, 2.2, 0.28), Color(0.30, 0.22, 0.16), false)
-	var crown := MeshInstance3D.new()
-	var mesh := SphereMesh.new()
-	mesh.radius = 1.25
-	mesh.height = 2.5
-	crown.mesh = mesh
-	var material := StandardMaterial3D.new()
-	material.albedo_color = Color(0.20, 0.35, 0.25)
-	material.roughness = 1.0
-	crown.material_override = material
-	crown.position = position + Vector3(0, 3.0, 0)
-	add_child(crown)
+	for cluster_index in range(4):
+		var crown := MeshInstance3D.new()
+		var mesh := SphereMesh.new()
+		mesh.radius = 0.95 if cluster_index == 0 else 0.72
+		mesh.height = mesh.radius * 2.0
+		crown.mesh = mesh
+		var material := StandardMaterial3D.new()
+		material.albedo_color = Color(0.16, 0.29, 0.19) if cluster_index % 2 == 0 else Color(0.22, 0.36, 0.23)
+		material.roughness = 1.0
+		crown.material_override = material
+		var offsets: Array[Vector3] = [Vector3(0, 3.0, 0), Vector3(0.55, 2.8, 0.2), Vector3(-0.48, 2.75, 0.25), Vector3(0.0, 3.35, -0.45)]
+		crown.position = position + offsets[cluster_index]
+		add_child(crown)
 
 func _add_box(node_name: String, position: Vector3, dimensions: Vector3, color: Color, collision: bool = true) -> Node3D:
 	var parent: Node3D = self
@@ -135,6 +162,7 @@ func _add_box(node_name: String, position: Vector3, dimensions: Vector3, color: 
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
 	material.roughness = 0.88
+	material.metallic = 0.0
 	mesh_instance.material_override = material
 	mesh_instance.position = position
 	if collision:
@@ -152,6 +180,73 @@ func _add_box(node_name: String, position: Vector3, dimensions: Vector3, color: 
 		return body
 	parent.add_child(mesh_instance)
 	return mesh_instance
+
+func _set_box_material(box_node: Node3D, mesh_name: String, material: Material) -> void:
+	if not is_instance_valid(box_node):
+		return
+	var mesh_instance := box_node as MeshInstance3D
+	if mesh_instance == null:
+		mesh_instance = box_node.get_node_or_null(mesh_name) as MeshInstance3D
+	if is_instance_valid(mesh_instance):
+		mesh_instance.material_override = material
+
+func _make_brick_material(base_color: Color, seed_value: int) -> ShaderMaterial:
+	var shader := Shader.new()
+	shader.code = """
+shader_type spatial;
+render_mode diffuse_burley, specular_schlick_ggx;
+uniform vec4 brick_tint : source_color = vec4(0.55, 0.30, 0.22, 1.0);
+uniform vec4 mortar_tint : source_color = vec4(0.25, 0.22, 0.19, 1.0);
+uniform float pattern_scale = 1.0;
+float hash21(vec2 p) {
+    p = fract(p * vec2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
+}
+void fragment() {
+    vec2 grid_uv = UV * vec2(5.0, 7.0) * pattern_scale;
+    float row = floor(grid_uv.y);
+    grid_uv.x += mod(row, 2.0) * 0.5;
+    vec2 cell = fract(grid_uv);
+    float inside_brick = step(0.035, cell.x) * step(0.055, cell.y) * (1.0 - step(0.965, cell.x)) * (1.0 - step(0.945, cell.y));
+    float variation = 0.88 + hash21(floor(grid_uv)) * 0.22;
+    float fine_grain = hash21(UV * 850.0) * 0.035;
+    vec3 brick = brick_tint.rgb * variation + fine_grain;
+    ALBEDO = mix(mortar_tint.rgb, brick, inside_brick);
+    ROUGHNESS = 0.91;
+    SPECULAR = 0.22;
+    AO = 0.92;
+}
+"""
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	material.set_shader_parameter("brick_tint", Color(base_color.r, base_color.g, base_color.b, 1.0))
+	material.set_shader_parameter("mortar_tint", Color(0.27, 0.23, 0.19, 1.0))
+	material.set_shader_parameter("pattern_scale", 0.9 + float(seed_value % 3) * 0.08)
+	return material
+
+func _make_asphalt_material() -> ShaderMaterial:
+	var shader := Shader.new()
+	shader.code = """
+shader_type spatial;
+void fragment() {
+    float grain = fract(sin(dot(UV * 1800.0, vec2(12.9898, 78.233))) * 43758.5453);
+    float variation = 0.88 + grain * 0.12;
+    ALBEDO = vec3(0.075, 0.085, 0.092) * variation;
+    ROUGHNESS = 0.78;
+    SPECULAR = 0.28;
+}
+"""
+	var material := ShaderMaterial.new()
+	material.shader = shader
+	return material
+
+func _make_pavement_material() -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(0.43, 0.44, 0.41)
+	material.roughness = 0.96
+	material.metallic = 0.0
+	return material
 
 func _create_player() -> void:
 	player = PlayerScript.new()
@@ -175,7 +270,9 @@ func _create_camera() -> void:
 	camera.position = Vector3(0.0, 1.0, 5.8)
 	camera.rotation.x = camera_pitch
 	camera.current = true
-	camera.fov = 68.0
+	camera.fov = 65.0
+	camera.near = 0.08
+	camera.far = 240.0
 	camera_pivot.add_child(camera)
 	player.camera_pivot = camera_pivot
 
@@ -257,6 +354,12 @@ func _update_daylight() -> void:
 	elif hour >= 4.0 and hour < 6.0:
 		daylight = lerpf(0.16, 1.15, (hour - 4.0) / 2.0)
 	sun_light.light_energy = daylight
+	if hour >= 16.0 and hour < 20.0:
+		sun_light.light_color = Color(1.0, 0.78, 0.58).lerp(Color.WHITE, clampf((hour - 16.0) / 4.0, 0.0, 1.0))
+	elif hour >= 5.0 and hour < 8.0:
+		sun_light.light_color = Color(1.0, 0.82, 0.68).lerp(Color.WHITE, clampf((hour - 5.0) / 3.0, 0.0, 1.0))
+	else:
+		sun_light.light_color = Color(0.66, 0.75, 0.90) if daylight < 0.4 else Color.WHITE
 	sun_light.rotation_degrees.x = lerpf(-8.0, -72.0, clampf((hour - 6.0) / 13.0, 0.0, 1.0))
 
 func _create_home_and_life_ui() -> void:
