@@ -8,6 +8,13 @@ signal shop_button_pressed
 signal work_button_pressed
 signal rent_button_pressed
 signal transport_button_pressed
+signal talk_button_pressed
+signal dialogue_choice_pressed(choice_index: int)
+
+var dialogue_panel: PanelContainer
+var dialogue_title: Label
+var dialogue_body: Label
+var dialogue_buttons: Array[Button] = []
 
 var status_label: Label
 var home_button: Button
@@ -85,17 +92,59 @@ func _build_ui() -> void:
 	transport_button.pressed.connect(func(): transport_button_pressed.emit())
 	column.add_child(transport_button)
 
+	var talk_button := Button.new()
+	talk_button.text = "گفت‌وگو با مردم"
+	talk_button.custom_minimum_size = Vector2(250.0, 40.0)
+	talk_button.pressed.connect(func(): talk_button_pressed.emit())
+	column.add_child(talk_button)
+
 	var rent_button := Button.new()
 	rent_button.text = "پرداخت اجاره"
 	rent_button.custom_minimum_size = Vector2(130.0, 38.0)
 	rent_button.pressed.connect(func(): rent_button_pressed.emit())
 	column.add_child(rent_button)
 
+	dialogue_panel = PanelContainer.new()
+	dialogue_panel.position = Vector2(360.0, 350.0)
+	dialogue_panel.custom_minimum_size = Vector2(560.0, 240.0)
+	dialogue_panel.visible = false
+	add_child(dialogue_panel)
+	var dialogue_column := VBoxContainer.new()
+	dialogue_panel.add_child(dialogue_column)
+	dialogue_title = Label.new()
+	dialogue_title.add_theme_font_size_override("font_size", 20)
+	dialogue_column.add_child(dialogue_title)
+	dialogue_body = Label.new()
+	dialogue_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	dialogue_body.custom_minimum_size = Vector2(520.0, 70.0)
+	dialogue_column.add_child(dialogue_body)
+	for i in range(3):
+		var choice_button := Button.new()
+		choice_button.custom_minimum_size = Vector2(500.0, 36.0)
+		choice_button.pressed.connect(_on_dialogue_choice.bind(i))
+		dialogue_column.add_child(choice_button)
+		dialogue_buttons.append(choice_button)
+
 	message_label = Label.new()
 	message_label.position = Vector2(22.0, 258.0)
 	message_label.add_theme_font_size_override("font_size", 15)
 	message_label.add_theme_color_override("font_color", Color(0.98, 0.88, 0.62))
 	add_child(message_label)
+
+func _on_dialogue_choice(index: int) -> void:
+	dialogue_choice_pressed.emit(index)
+
+func show_dialogue(title: String, body: String, choices: Array[String], visible: bool) -> void:
+	dialogue_panel.visible = visible
+	if not visible:
+		return
+	dialogue_title.text = title
+	dialogue_body.text = body
+	for i in range(dialogue_buttons.size()):
+		var button := dialogue_buttons[i]
+		button.visible = i < choices.size()
+		if i < choices.size():
+			button.text = choices[i]
 
 func set_home_state(inside: bool) -> void:
 	home_button.text = "خروج از خانه" if inside else "ورود به خانه"
