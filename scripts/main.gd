@@ -309,8 +309,12 @@ func _create_hud() -> void:
 	layer.add_child(root)
 
 	var top_panel := PanelContainer.new()
-	top_panel.position = Vector2(22.0, 18.0)
-	top_panel.custom_minimum_size = Vector2(520.0, 58.0)
+	top_panel.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	top_panel.offset_left = 16.0
+	top_panel.offset_top = 14.0
+	top_panel.offset_right = 440.0
+	top_panel.offset_bottom = 68.0
+	top_panel.custom_minimum_size = Vector2(424.0, 54.0)
 	var panel_style := StyleBoxFlat.new()
 	panel_style.bg_color = Color(0.035, 0.075, 0.09, 0.78)
 	panel_style.corner_radius_top_left = 12
@@ -329,14 +333,22 @@ func _create_hud() -> void:
 
 	hint_label = Label.new()
 	hint_label.text = "حرکت: جوی‌استیک سمت چپ     |     چرخش دوربین: کشیدن سمت راست"
-	hint_label.position = Vector2(22.0, 84.0)
+	hint_label.set_anchors_preset(Control.PRESET_TOP_LEFT)
+	hint_label.offset_left = 18.0
+	hint_label.offset_top = 74.0
+	hint_label.offset_right = 470.0
+	hint_label.offset_bottom = 100.0
 	hint_label.add_theme_font_size_override("font_size", 16)
 	hint_label.add_theme_color_override("font_color", Color(0.92, 0.91, 0.82))
 	root.add_child(hint_label)
 
 	time_label = Label.new()
 	time_label.text = "روز اول  |  ۰۸:۰۰"
-	time_label.position = Vector2(1010.0, 24.0)
+	time_label.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	time_label.offset_left = -180.0
+	time_label.offset_top = 18.0
+	time_label.offset_right = -18.0
+	time_label.offset_bottom = 48.0
 	time_label.add_theme_font_size_override("font_size", 20)
 	time_label.add_theme_color_override("font_color", Color(0.96, 0.94, 0.86))
 	root.add_child(time_label)
@@ -344,23 +356,31 @@ func _create_hud() -> void:
 	joystick = JoystickScript.new()
 	joystick.name = "VirtualJoystick"
 	joystick.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	joystick.offset_left = 28.0
-	joystick.offset_top = -208.0
-	joystick.offset_right = 208.0
-	joystick.offset_bottom = -28.0
+	joystick.offset_left = 24.0
+	joystick.offset_top = -220.0
+	joystick.offset_right = 220.0
+	joystick.offset_bottom = -24.0
 	joystick.vector_changed.connect(_on_joystick_changed)
 	root.add_child(joystick)
 
 	var look_hint := Label.new()
 	look_hint.text = "برای چرخاندن دوربین لمس و بکش"
-	look_hint.position = Vector2(930.0, 650.0)
+	look_hint.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	look_hint.offset_left = -280.0
+	look_hint.offset_top = -52.0
+	look_hint.offset_right = -18.0
+	look_hint.offset_bottom = -18.0
 	look_hint.add_theme_font_size_override("font_size", 14)
 	look_hint.add_theme_color_override("font_color", Color(0.95, 0.95, 0.90, 0.8))
 	root.add_child(look_hint)
 
 	var edit_character_button := Button.new()
 	edit_character_button.text = "ویرایش شخصیت"
-	edit_character_button.position = Vector2(1060.0, 78.0)
+	edit_character_button.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	edit_character_button.offset_left = -190.0
+	edit_character_button.offset_top = 72.0
+	edit_character_button.offset_right = -18.0
+	edit_character_button.offset_bottom = 118.0
 	edit_character_button.custom_minimum_size = Vector2(190.0, 42.0)
 	edit_character_button.pressed.connect(_open_character_creator)
 	root.add_child(edit_character_button)
