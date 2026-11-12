@@ -7,6 +7,9 @@ config_version=5
 config/name="MY TOMORROW"
 run/main_scene="res://scenes/main.tscn"
 
+[autoload]
+ProfileManager="*res://scripts/profile_manager.gd"
+
 [display]
 window/size/viewport_width=1280
 window/size/viewport_height=720
