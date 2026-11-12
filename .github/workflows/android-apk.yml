@@ -28,6 +28,11 @@ jobs:
             "platforms;android-34" \
             "cmdline-tools;latest"
 
+      - name: Install download utility
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends curl ca-certificates
+
       - name: Install matching Godot Android export templates
         run: |
           mkdir -p /tmp/godot-templates "$HOME/.local/share/godot/export_templates/4.4.1.stable"
