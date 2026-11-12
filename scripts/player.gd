@@ -13,6 +13,9 @@ var hair_material: StandardMaterial3D
 var pants_material: StandardMaterial3D
 var shoe_material: StandardMaterial3D
 var hair_mesh_instance: MeshInstance3D
+var left_eye: MeshInstance3D
+var right_eye: MeshInstance3D
+var mouth: MeshInstance3D
 var left_arm: MeshInstance3D
 var right_arm: MeshInstance3D
 var left_leg: MeshInstance3D
@@ -76,8 +79,43 @@ func _build_character() -> void:
 	hair_mesh.rings = 8
 	hair_mesh_instance.mesh = hair_mesh
 	hair_mesh_instance.material_override = hair_material
+
 	hair_mesh_instance.position = Vector3(0,1.91,-0.015)
 	add_child(hair_mesh_instance)
+	var eye_material := _make_material(Color(0.96, 0.94, 0.87), 0.35)
+	var iris_material := _make_material(Color(0.18, 0.27, 0.31), 0.3)
+	for side in [-1.0, 1.0]:
+		var eye := MeshInstance3D.new()
+		var eye_mesh := SphereMesh.new()
+		eye_mesh.radius = 0.038
+		eye_mesh.height = 0.055
+		eye.mesh = eye_mesh
+		eye.material_override = eye_material
+		eye.position = Vector3(side * 0.085, 1.75, -0.208)
+		add_child(eye)
+		var iris := MeshInstance3D.new()
+		var iris_mesh := SphereMesh.new()
+		iris_mesh.radius = 0.018
+		iris_mesh.height = 0.026
+		iris.mesh = iris_mesh
+		iris.material_override = iris_material
+		iris.position = Vector3(side * 0.085, 1.75, -0.241)
+		add_child(iris)
+	var nose := MeshInstance3D.new()
+	var nose_mesh := SphereMesh.new()
+	nose_mesh.radius = 0.035
+	nose_mesh.height = 0.075
+	nose.mesh = nose_mesh
+	nose.material_override = skin_material
+	nose.position = Vector3(0, 1.69, -0.235)
+	add_child(nose)
+	mouth = MeshInstance3D.new()
+	var mouth_mesh := BoxMesh.new()
+	mouth_mesh.size = Vector3(0.085, 0.018, 0.018)
+	mouth.mesh = mouth_mesh
+	mouth.material_override = _make_material(Color(0.35, 0.12, 0.12))
+	mouth.position = Vector3(0, 1.635, -0.224)
+	add_child(mouth)
 
 	left_arm = _add_capsule("Left sleeve",0.105,0.66,body_material,Vector3(-0.36,1.08,0))
 	right_arm = _add_capsule("Right sleeve",0.105,0.66,body_material,Vector3(0.36,1.08,0))
@@ -117,10 +155,9 @@ func set_move_input(value: Vector2) -> void:
 
 func _physics_process(delta: float) -> void:
 	var input_vector := move_input
-	if not OS.has_feature("mobile"):
-		input_vector = Input.get_vector("move_left","move_right","move_forward","move_back")
-		if input_vector == Vector2.ZERO:
-			input_vector = move_input
+	var keyboard_input := Input.get_vector("move_left","move_right","move_forward","move_back")
+	if keyboard_input != Vector2.ZERO:
+		input_vector = keyboard_input
 	var basis := global_transform.basis
 	if is_instance_valid(camera_pivot):
 		basis = camera_pivot.global_transform.basis
