@@ -12,8 +12,8 @@ var message_label: Label
 var saved_profile: Dictionary = {}
 
 func _ready() -> void:
-	_build_interface()
 	saved_profile = ProfileManager.load_profile()
+	_build_interface()
 	if not saved_profile.is_empty():
 		first_name_input.text = str(saved_profile.get("first_name", ""))
 		last_name_input.text = str(saved_profile.get("last_name", ""))
@@ -97,7 +97,7 @@ func _add_text_field(parent: VBoxContainer, field_title: String) -> LineEdit:
 	parent.add_child(field)
 	return field
 
-func _add_option(parent: VBoxContainer, field_title: String, choices: Array[String]) -> OptionButton:
+func _add_option(parent: VBoxContainer, field_title: String, choices: Array) -> OptionButton:
 	var label := Label.new()
 	label.text = field_title
 	label.add_theme_color_override("font_color", Color(0.87, 0.91, 0.89))
