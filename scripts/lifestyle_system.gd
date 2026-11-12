@@ -75,9 +75,9 @@ func buy_home_upgrade(upgrade_id: String) -> String:
 func begin_minigame(game_id: String) -> String:
 	if game_id != "cooking" and game_id != "painting":
 		return "این بازی کوچک پیدا نشد."
-	if game_id == "cooking" and not LifeSystem.energy >= 5.0:
+	if game_id == "cooking" and LifeSystem.energy < 5.0:
 		return "برای تمرین آشپزی انرژی کافی نداری."
-	if game_id == "painting" and not LifeSystem.energy >= 5.0:
+	if game_id == "painting" and LifeSystem.energy < 5.0:
 		return "برای نقاشی انرژی کافی نداری."
 	active_minigame = game_id
 	minigame_step = 0
