@@ -1,9 +1,0 @@
-.godot/
-build/
-.export/
-*.apk
-*.aab
-*.keystore
-*.jks
-*.log
-.DS_Store
