@@ -96,6 +96,8 @@ jobs:
         run: |
           test -s build/MY_TOMORROW-debug.apk
           ls -lh build/MY_TOMORROW-debug.apk
+          APK_BYTES=$(stat -c%s build/MY_TOMORROW-debug.apk)
+          test "$APK_BYTES" -lt 419430400
           unzip -t build/MY_TOMORROW-debug.apk
           "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose build/MY_TOMORROW-debug.apk
           sha256sum build/MY_TOMORROW-debug.apk
