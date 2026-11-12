@@ -11,6 +11,7 @@ run/main_scene="res://scenes/main.tscn"
 ProfileManager="*res://scripts/profile_manager.gd"
 LifeSystem="*res://scripts/life_system.gd"
 EconomySystem="*res://scripts/economy_system.gd"
+SocialStory="*res://scripts/social_story.gd"
 
 [display]
 window/size/viewport_width=1280
