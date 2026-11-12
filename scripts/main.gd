@@ -9,12 +9,13 @@ const LifeHUDScript = preload("res://scripts/life_hud.gd")
 var player: CharacterBody3D
 var camera_pivot: Node3D
 var camera: Camera3D
+var sun_light: DirectionalLight3D
 var joystick: Control
 var hud_label: Label
 var hint_label: Label
 var time_label: Label
-var home_world: Node3D
-var life_hud: CanvasLayer
+var home_world: HomeWorld
+var life_hud: LifeHUD
 var look_touch_id: int = -1
 var look_last_position: Vector2 = Vector2.ZERO
 var camera_pitch: float = -0.16
@@ -36,6 +37,7 @@ func _process(_delta: float) -> void:
 		hud_label.text = "%s  •  لندن ۲۰۱۸     |     موقعیت: %.0f ، %.0f" % [player_display_name, player.global_position.x, player.global_position.z]
 	if is_instance_valid(time_label):
 		time_label.text = "روز %d  |  %s" % [LifeSystem.day_number, LifeSystem.get_clock_text()]
+	_update_daylight()
 
 func _setup_environment() -> void:
 	var world_environment := WorldEnvironment.new()
@@ -56,11 +58,11 @@ func _setup_environment() -> void:
 	world_environment.environment = environment
 	add_child(world_environment)
 
-	var sun := DirectionalLight3D.new()
-	sun.rotation_degrees = Vector3(-48.0, -28.0, 0.0)
-	sun.light_energy = 1.15
-	sun.shadow_enabled = true
-	add_child(sun)
+	sun_light = DirectionalLight3D.new()
+	sun_light.rotation_degrees = Vector3(-48.0, -28.0, 0.0)
+	sun_light.light_energy = 1.15
+	sun_light.shadow_enabled = true
+	add_child(sun_light)
 
 func _build_city_block() -> void:
 	_add_box("Ground", Vector3(0, -0.55, 0), Vector3(100, 1, 100), Color(0.29, 0.34, 0.32))
@@ -233,6 +235,20 @@ func _create_hud() -> void:
 	edit_character_button.custom_minimum_size = Vector2(190.0, 42.0)
 	edit_character_button.pressed.connect(_open_character_creator)
 	root.add_child(edit_character_button)
+
+func _update_daylight() -> void:
+	if not is_instance_valid(sun_light):
+		return
+	var hour := float(LifeSystem.minutes_of_day) / 60.0
+	var daylight := 0.16
+	if hour >= 6.0 and hour <= 19.0:
+		daylight = 1.15
+	elif hour > 19.0 and hour < 21.0:
+		daylight = lerpf(1.15, 0.16, (hour - 19.0) / 2.0)
+	elif hour >= 4.0 and hour < 6.0:
+		daylight = lerpf(0.16, 1.15, (hour - 4.0) / 2.0)
+	sun_light.light_energy = daylight
+	sun_light.rotation_degrees.x = lerpf(-8.0, -72.0, clampf((hour - 6.0) / 13.0, 0.0, 1.0))
 
 func _create_home_and_life_ui() -> void:
 	home_world = HomeWorldScript.new()
