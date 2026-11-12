@@ -55,6 +55,7 @@ func choose_dialogue(choice_index: int) -> void:
 		body = "از آشنایی با تو خوشحال شدم. روز خوبی داشته باشی!"
 		choices = ["پایان"]
 	relationships[key] = mini(affinity, 10)
+	_update_quest_stage()
 	_save_state()
 	social_changed.emit()
 	if choice_index == 2:
@@ -67,6 +68,12 @@ func _finish_dialogue() -> void:
 	active_person = -1
 	active_choices.clear()
 	dialogue_changed.emit("", "", [], false)
+
+func _update_quest_stage() -> void:
+	if relationships.size() >= 3:
+		quest_stage = 2
+	elif relationships.size() >= 1:
+		quest_stage = 1
 
 func get_relationship_summary() -> String:
 	return "آشنایی‌ها: %d نفر" % relationships.size()
