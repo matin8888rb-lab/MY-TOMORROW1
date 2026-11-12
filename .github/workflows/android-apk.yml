@@ -81,6 +81,13 @@ jobs:
       - name: Import and validate project
         run: godot --headless --editor --path . --quit
 
+      - name: Restart and verify ADB service
+        run: |
+          adb kill-server || true
+          adb start-server
+          adb version
+          adb devices -l
+
       - name: Export debug APK
         env:
           GODOT_ANDROID_KEYSTORE_DEBUG_PATH: /github/home/.android/debug.keystore
