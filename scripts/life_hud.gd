@@ -22,15 +22,22 @@ var message_label: Label
 var money_label: Label
 var economy_label: Label
 var story_label: Label
+var skill_label: Label
+var is_home_open: bool = false
+var minigame_panel: PanelContainer
+var minigame_title: Label
+var minigame_buttons: Array[Button] = []
 
 func _ready() -> void:
 	_build_ui()
 	LifeSystem.life_changed.connect(update_status)
 	EconomySystem.economy_changed.connect(update_economy)
 	SocialStory.social_changed.connect(update_social_status)
+	LifestyleSystem.lifestyle_changed.connect(update_lifestyle_status)
 	update_status()
 	update_economy()
 	update_social_status()
+	update_lifestyle_status()
 
 func _build_ui() -> void:
 	var panel := PanelContainer.new()
@@ -61,6 +68,10 @@ func _build_ui() -> void:
 	story_label.add_theme_font_size_override("font_size", 13)
 	story_label.add_theme_color_override("font_color", Color(0.75, 0.88, 0.82))
 	column.add_child(story_label)
+	skill_label = Label.new()
+	skill_label.add_theme_font_size_override("font_size", 12)
+	skill_label.add_theme_color_override("font_color", Color(0.80, 0.86, 0.78))
+	column.add_child(skill_label)
 
 	home_button = Button.new()
 	home_button.text = "ورود به خانه"
@@ -132,11 +143,108 @@ func _build_ui() -> void:
 		dialogue_column.add_child(choice_button)
 		dialogue_buttons.append(choice_button)
 
+
+	var activity_panel := PanelContainer.new()
+	activity_panel.position = Vector2(960.0, 145.0)
+	activity_panel.custom_minimum_size = Vector2(290.0, 360.0)
+	var activity_column := VBoxContainer.new()
+	activity_panel.add_child(activity_column)
+	var activity_title := Label.new()
+	activity_title.text = "زندگی آزاد و سرگرمی‌ها"
+	activity_title.add_theme_font_size_override("font_size", 18)
+	activity_column.add_child(activity_title)
+	_add_activity_button(activity_column, "کتاب‌خوانی", "reading")
+	_add_activity_button(activity_column, "پیاده‌روی در شهر", "walking")
+	_add_activity_button(activity_column, "نقاشی آزاد", "painting")
+	var event_button := Button.new()
+	event_button.text = "شرکت در رویداد محله £5"
+	event_button.pressed.connect(_on_city_event_pressed)
+	activity_column.add_child(event_button)
+	var upgrade_title := Label.new()
+	upgrade_title.text = "ارتقای خانه"
+	activity_column.add_child(upgrade_title)
+	_add_upgrade_button(activity_column, "چراغ ایستاده £25", "lamp")
+	_add_upgrade_button(activity_column, "قفسه کتاب £45", "bookshelf")
+	_add_upgrade_button(activity_column, "گیاه آپارتمانی £18", "plant")
+	add_child(activity_panel)
+
+	minigame_panel = PanelContainer.new()
+	minigame_panel.position = Vector2(420.0, 170.0)
+	minigame_panel.custom_minimum_size = Vector2(420.0, 260.0)
+	minigame_panel.visible = false
+	add_child(minigame_panel)
+	var mini_column := VBoxContainer.new()
+	minigame_panel.add_child(mini_column)
+	minigame_title = Label.new()
+	minigame_title.add_theme_font_size_override("font_size", 20)
+	mini_column.add_child(minigame_title)
+	var cooking_button := Button.new()
+	cooking_button.text = "تمرین آشپزی"
+	cooking_button.pressed.connect(func(): _start_minigame("cooking"))
+	mini_column.add_child(cooking_button)
+	var painting_button := Button.new()
+	painting_button.text = "بازی ترتیب رنگ‌ها"
+	painting_button.pressed.connect(func(): _start_minigame("painting"))
+	mini_column.add_child(painting_button)
+	var mini_choices: Array[String] = ["نان", "پنیر", "گوجه"]
+	for choice in mini_choices:
+		var choice_button := Button.new()
+		choice_button.text = choice
+		choice_button.pressed.connect(_on_minigame_choice.bind(choice))
+		mini_column.add_child(choice_button)
+		minigame_buttons.append(choice_button)
+	var close_mini := Button.new()
+	close_mini.text = "بستن"
+	close_mini.pressed.connect(func(): minigame_panel.visible = false)
+	mini_column.add_child(close_mini)
+
 	message_label = Label.new()
 	message_label.position = Vector2(22.0, 258.0)
 	message_label.add_theme_font_size_override("font_size", 15)
 	message_label.add_theme_color_override("font_color", Color(0.98, 0.88, 0.62))
 	add_child(message_label)
+
+func _add_activity_button(parent: VBoxContainer, caption: String, activity_id: String) -> void:
+	var button := Button.new()
+	button.text = caption
+	button.pressed.connect(_on_activity_pressed.bind(activity_id))
+	parent.add_child(button)
+
+func _add_upgrade_button(parent: VBoxContainer, caption: String, upgrade_id: String) -> void:
+	var button := Button.new()
+	button.text = caption
+	button.pressed.connect(_on_upgrade_pressed.bind(upgrade_id))
+	parent.add_child(button)
+
+func _on_activity_pressed(activity_id: String) -> void:
+	show_message(LifestyleSystem.do_activity(activity_id))
+
+func _on_city_event_pressed() -> void:
+	show_message(LifestyleSystem.attend_city_event())
+
+func _on_upgrade_pressed(upgrade_id: String) -> void:
+	if not is_home_open:
+		show_message("برای خرید و چیدمان وسیله، اول وارد خانه شو.")
+		return
+	show_message(LifestyleSystem.buy_home_upgrade(upgrade_id))
+
+func _start_minigame(game_id: String) -> void:
+	show_message(LifestyleSystem.begin_minigame(game_id))
+	minigame_panel.visible = LifestyleSystem.active_minigame != ""
+	if game_id == "cooking":
+		minigame_title.text = "آشپزی: نان، پنیر، گوجه را به ترتیب بزن"
+		for i in range(minigame_buttons.size()):
+			minigame_buttons[i].text = ["نان", "پنیر", "گوجه"][i]
+	else:
+		minigame_title.text = "رنگ‌ها: آبی، زرد، سبز را به ترتیب بزن"
+		for i in range(minigame_buttons.size()):
+			minigame_buttons[i].text = ["آبی", "زرد", "سبز"][i]
+
+func _on_minigame_choice(choice: String) -> void:
+	var result := LifestyleSystem.submit_minigame_step(choice)
+	show_message(result)
+	if LifestyleSystem.active_minigame == "":
+		minigame_panel.visible = false
 
 func _on_dialogue_choice(index: int) -> void:
 	dialogue_choice_pressed.emit(index)
@@ -154,6 +262,7 @@ func show_dialogue(title: String, body: String, choices: Array[String], visible:
 			button.text = choices[i]
 
 func set_home_state(inside: bool) -> void:
+	is_home_open = inside
 	home_button.text = "خروج از خانه" if inside else "ورود به خانه"
 
 func show_message(value: String) -> void:
@@ -162,6 +271,10 @@ func show_message(value: String) -> void:
 func update_social_status() -> void:
 	if is_instance_valid(story_label):
 		story_label.text = SocialStory.get_quest_text() + "  |  " + SocialStory.get_relationship_summary()
+
+func update_lifestyle_status() -> void:
+	if is_instance_valid(skill_label):
+		skill_label.text = LifestyleSystem.get_skill_summary() + "\n" + LifestyleSystem.get_progress_summary()
 
 func update_economy() -> void:
 	if not is_instance_valid(money_label):
