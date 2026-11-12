@@ -31,19 +31,19 @@ func _build_interface() -> void:
 
 	var panel := PanelContainer.new()
 	panel.set_anchors_preset(Control.PRESET_CENTER)
-	panel.offset_left = -270.0
-	panel.offset_top = -285.0
-	panel.offset_right = 270.0
-	panel.offset_bottom = 285.0
+	panel.offset_left = -300.0
+	panel.offset_top = -325.0
+	panel.offset_right = 300.0
+	panel.offset_bottom = 325.0
 	var panel_style := StyleBoxFlat.new()
 	panel_style.bg_color = Color(0.08, 0.13, 0.16, 0.98)
 	panel_style.set_corner_radius_all(18)
-	panel_style.set_content_margin_all(22.0)
+	panel_style.set_content_margin_all(20.0)
 	panel.add_theme_stylebox_override("panel", panel_style)
 	add_child(panel)
 
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("separation", 10)
+	column.add_theme_constant_override("separation", 8)
 	panel.add_child(column)
 
 	var title := Label.new()
@@ -60,12 +60,24 @@ func _build_interface() -> void:
 	subtitle.add_theme_color_override("font_color", Color(0.72, 0.81, 0.81))
 	column.add_child(subtitle)
 
-	first_name_input = _add_text_field(column, "نام")
-	last_name_input = _add_text_field(column, "نام خانوادگی")
-	skin_option = _add_option(column, "رنگ پوست", ["روشن", "گندمی", "سبزه", "تیره"])
-	hair_option = _add_option(column, "رنگ مو", ["مشکی", "قهوه‌ای", "بلوند", "قرمز تیره"])
-	style_option = _add_option(column, "مدل مو", ["کوتاه", "معمولی", "بلند"])
-	outfit_option = _add_option(column, "رنگ لباس", ["آبی", "سبز", "قرمز", "خاکستری"])
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.custom_minimum_size = Vector2(0, 340)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	column.add_child(scroll)
+
+	var form_column := VBoxContainer.new()
+	form_column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	form_column.add_theme_constant_override("separation", 8)
+	scroll.add_child(form_column)
+
+	first_name_input = _add_text_field(form_column, "نام")
+	last_name_input = _add_text_field(form_column, "نام خانوادگی")
+	skin_option = _add_option(form_column, "رنگ پوست", ["روشن", "گندمی", "سبزه", "تیره"])
+	hair_option = _add_option(form_column, "رنگ مو", ["مشکی", "قهوه‌ای", "بلوند", "قرمز تیره"])
+	style_option = _add_option(form_column, "مدل مو", ["کوتاه", "معمولی", "بلند"])
+	outfit_option = _add_option(form_column, "رنگ لباس", ["آبی", "سبز", "قرمز", "خاکستری"])
 
 	message_label = Label.new()
 	message_label.text = ""
@@ -74,14 +86,16 @@ func _build_interface() -> void:
 	column.add_child(message_label)
 
 	var save_button := Button.new()
-	save_button.text = "ذخیره شخصیت و شروع"
-	save_button.custom_minimum_size = Vector2(0, 46)
+	save_button.text = "تأیید و ادامه"
+	save_button.custom_minimum_size = Vector2(0, 50)
+	save_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	save_button.pressed.connect(_confirm_new_profile)
 	column.add_child(save_button)
 
 	var continue_button := Button.new()
 	continue_button.text = "ادامه با شخصیت ذخیره‌شده"
-	continue_button.custom_minimum_size = Vector2(0, 42)
+	continue_button.custom_minimum_size = Vector2(0, 44)
+	continue_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	continue_button.visible = not saved_profile.is_empty()
 	continue_button.pressed.connect(_continue_saved_profile)
 	column.add_child(continue_button)
