@@ -56,13 +56,8 @@ jobs:
           export/android/java_sdk_path = "/usr/lib/jvm/java-17-openjdk-amd64"
           export/android/android_sdk_path = "$ANDROID_HOME"
           EOF
-          keytool -genkeypair -noprompt \
-            -keystore "$HOME/.android/debug.keystore" \
-            -storepass android \
-            -alias androiddebugkey \
-            -keypass android \
-            -dname "CN=Android Debug,O=Android,C=US" \
-            -keyalg RSA -keysize 2048 -validity 10000
+          base64 -d ci/debug.keystore.b64 > "$HOME/.android/debug.keystore"
+          keytool -list -keystore "$HOME/.android/debug.keystore" -storepass android -alias androiddebugkey
 
       - name: Verify complete Android build environment
         run: |
