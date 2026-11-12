@@ -13,6 +13,7 @@ var npc_data: Array[Dictionary] = []
 var route_stops: Array[Vector3] = [Vector3(5.1, 0.12, 13.0), Vector3(65.0, 0.12, 13.0)]
 var current_district: int = 0
 var npc_clock_bucket: int = -1
+const NPC_NAMES: Array[String] = ["اِما", "جیمز", "سوفیا", "الیور", "میا", "نوآ"]
 
 func setup(target_player: CharacterBody3D) -> void:
 	player = target_player
@@ -90,7 +91,7 @@ func _build_npcs() -> void:
 		head.material_override = mat
 		actor.add_child(head)
 		add_child(actor)
-		npc_data.append({"actor": actor, "district": district, "target": _pick_waypoint(district), "speed": 1.0 + float(i % 3) * 0.18, "routine": -1})
+		npc_data.append({"actor": actor, "district": district, "target": _pick_waypoint(district), "speed": 1.0 + float(i % 3) * 0.18, "routine": -1, "person_id": i})
 
 func _update_npc_routines() -> void:
 	var hour := int(LifeSystem.minutes_of_day / 60)
@@ -117,6 +118,17 @@ func _pick_waypoint(district: int) -> Vector3:
 	var x := center_x + side * float(randi_range(5, 17))
 	var z := float(randi_range(-30, 30))
 	return Vector3(x, 0.12, z)
+
+func get_nearest_person(target_player: CharacterBody3D, max_distance: float = 4.5) -> int:
+	var nearest_id := -1
+	var best_distance := max_distance
+	for data in npc_data:
+		var actor: Node3D = data["actor"]
+		var distance := target_player.global_position.distance_to(actor.global_position)
+		if distance < best_distance:
+			best_distance = distance
+			nearest_id = int(data["person_id"])
+	return nearest_id
 
 func take_bus(target_player: CharacterBody3D) -> String:
 	if not is_instance_valid(target_player):
