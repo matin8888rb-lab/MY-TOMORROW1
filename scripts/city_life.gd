@@ -72,26 +72,63 @@ func _build_npcs() -> void:
 		var actor := Node3D.new()
 		actor.name = "CityResident_%d" % i
 		actor.position = start
-		var body := MeshInstance3D.new()
-		var capsule := CapsuleMesh.new()
-		capsule.radius = 0.27
-		capsule.height = 1.55
-		body.mesh = capsule
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = NPC_COLORS[i % NPC_COLORS.size()]
-		body.material_override = mat
-		body.position.y = 0.78
-		actor.add_child(body)
+		var skin := StandardMaterial3D.new()
+		skin.albedo_color = [Color(0.88,0.68,0.52),Color(0.63,0.42,0.30),Color(0.40,0.27,0.20)][i % 3]
+		var outfit := StandardMaterial3D.new()
+		outfit.albedo_color = NPC_COLORS[i % NPC_COLORS.size()]
+		var dark := StandardMaterial3D.new()
+		dark.albedo_color = Color(0.10,0.12,0.15)
+		_add_actor_capsule(actor,"Torso",0.25,0.72,outfit,Vector3(0,1.02,0))
+		_add_actor_capsule(actor,"Neck",0.075,0.16,skin,Vector3(0,1.48,0))
 		var head := MeshInstance3D.new()
 		var head_mesh := SphereMesh.new()
 		head_mesh.radius = 0.19
-		head_mesh.height = 0.38
+		head_mesh.height = 0.39
 		head.mesh = head_mesh
-		head.position.y = 1.62
-		head.material_override = mat
+		head.position.y = 1.68
+		head.material_override = skin
 		actor.add_child(head)
+		var hair := MeshInstance3D.new()
+		var hair_mesh := SphereMesh.new()
+		hair_mesh.radius = 0.195
+		hair_mesh.height = 0.16
+		hair.mesh = hair_mesh
+		hair.position = Vector3(0,1.83,0)
+		hair.material_override = dark
+		actor.add_child(hair)
+		for side in [-1.0,1.0]:
+			var eye_mat := StandardMaterial3D.new()
+			eye_mat.albedo_color = Color(0.06,0.07,0.08)
+			_add_actor_sphere(actor,"Eye",0.025,eye_mat,Vector3(side*0.065,1.70,-0.17))
+			_add_actor_capsule(actor,"Arm",0.075,0.56,outfit,Vector3(side*0.31,1.04,0))
+			_add_actor_capsule(actor,"Leg",0.09,0.62,dark,Vector3(side*0.13,0.39,0))
+		_add_actor_capsule(actor,"Shoe",0.095,0.20,dark,Vector3(-0.13,0.10,-0.04))
+		_add_actor_capsule(actor,"Shoe",0.095,0.20,dark,Vector3(0.13,0.10,-0.04))
 		add_child(actor)
 		npc_data.append({"actor": actor, "district": district, "target": _pick_waypoint(district), "speed": 1.0 + float(i % 3) * 0.18, "routine": -1, "person_id": i})
+
+func _add_actor_capsule(parent: Node3D, node_name: String, radius: float, height: float, material: Material, position: Vector3) -> void:
+	var mesh_instance := MeshInstance3D.new()
+	mesh_instance.name = node_name
+	var mesh := CapsuleMesh.new()
+	mesh.radius = radius
+	mesh.height = height
+	mesh.radial_segments = 10
+	mesh_instance.mesh = mesh
+	mesh_instance.material_override = material
+	mesh_instance.position = position
+	parent.add_child(mesh_instance)
+
+func _add_actor_sphere(parent: Node3D, node_name: String, radius: float, material: Material, position: Vector3) -> void:
+	var mesh_instance := MeshInstance3D.new()
+	mesh_instance.name = node_name
+	var mesh := SphereMesh.new()
+	mesh.radius = radius
+	mesh.height = radius * 2.0
+	mesh_instance.mesh = mesh
+	mesh_instance.material_override = material
+	mesh_instance.position = position
+	parent.add_child(mesh_instance)
 
 func _update_npc_routines() -> void:
 	var hour := int(LifeSystem.minutes_of_day / 60)
