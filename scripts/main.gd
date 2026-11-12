@@ -39,7 +39,7 @@ func _ready() -> void:
 
 func _process(_delta: float) -> void:
 	if is_instance_valid(player) and is_instance_valid(hud_label):
-		hud_label.text = "%s  •  لندن ۲۰۱۸     |     موقعیت: %.0f ، %.0f" % [player_display_name, player.global_position.x, player.global_position.z]
+		hud_label.text = "%s  •  لندن ۲۰۰۰     |     موقعیت: %.0f ، %.0f" % [player_display_name, player.global_position.x, player.global_position.z]
 	if is_instance_valid(time_label):
 		time_label.text = "روز %d  |  %s" % [LifeSystem.day_number, LifeSystem.get_clock_text()]
 	_update_daylight()
@@ -58,34 +58,34 @@ func _setup_environment() -> void:
 	environment.sky = sky
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	environment.ambient_light_color = Color(0.68, 0.74, 0.78)
-	environment.ambient_light_energy = 0.65
+	environment.ambient_light_energy = 0.82
 	environment.tonemap_mode = Environment.TONE_MAPPER_FILMIC
-	environment.tonemap_exposure = 1.0
+	environment.tonemap_exposure = 1.08
 	environment.adjustment_enabled = true
 	environment.adjustment_contrast = 1.08
 	environment.adjustment_saturation = 1.06
 	environment.fog_enabled = true
 	environment.fog_light_color = Color(0.62, 0.69, 0.72)
-	environment.fog_density = 0.0012
+	environment.fog_density = 0.00072
 	environment.fog_sky_affect = 0.12
 	environment.glow_enabled = true
-	environment.glow_intensity = 0.28
+	environment.glow_intensity = 0.18
 	environment.glow_strength = 0.55
 	world_environment.environment = environment
 	add_child(world_environment)
 
 	sun_light = DirectionalLight3D.new()
 	sun_light.rotation_degrees = Vector3(-48.0, -28.0, 0.0)
-	sun_light.light_energy = 1.15
+	sun_light.light_energy = 1.28
 	sun_light.shadow_enabled = true
 	sun_light.shadow_bias = 0.035
 	sun_light.shadow_normal_bias = 1.25
-	sun_light.directional_shadow_max_distance = 110.0
+	sun_light.directional_shadow_max_distance = 85.0
 	add_child(sun_light)
 
 func _build_city_block() -> void:
 	_add_box("Ground", Vector3(0, -0.55, 0), Vector3(100, 1, 100), Color(0.29, 0.34, 0.32))
-	var road := _add_box("Road", Vector3(0, 0.015, 0), Vector3(7.0, 0.08, 76.0), Color(0.105, 0.12, 0.13))
+	var road := _add_box("Road", Vector3(0, 0.015, 0), Vector3(7.0, 0.08, 76.0), Color(0.19, 0.21, 0.22))
 	_set_box_material(road, "Road", _make_asphalt_material())
 	var left_pavement := _add_box("Left pavement", Vector3(-4.45, 0.08, 0), Vector3(1.9, 0.22, 76.0), Color(0.48, 0.49, 0.45))
 	var right_pavement := _add_box("Right pavement", Vector3(4.45, 0.08, 0), Vector3(1.9, 0.22, 76.0), Color(0.48, 0.49, 0.45))
@@ -103,6 +103,13 @@ func _build_city_block() -> void:
 
 	for index in range(5):
 		_create_tree(Vector3(6.7 + float(index % 2) * 1.4, 0.0, -24.0 + float(index) * 10.0))
+	for index in range(5):
+		_create_street_bollard(-5.25, -22.0 + float(index) * 10.0)
+		_create_street_bollard(5.25, -17.0 + float(index) * 10.0)
+	for index in range(7):
+		_add_box("Broken centre road marking", Vector3(0.0, 0.071, -29.0 + float(index) * 9.0), Vector3(0.075, 0.018, 3.8), Color(0.88, 0.84, 0.68), false)
+	_create_bench(Vector3(5.8, 0.12, -8.0))
+	_create_litter_bin(Vector3(-5.65, 0.12, 8.0))
 
 	_add_box("Square sign board", Vector3(0, 3.2, -34.0), Vector3(5.4, 1.2, 0.18), Color(0.12, 0.22, 0.24), false)
 	_add_box("Bus stop post", Vector3(5.1, 1.35, 13.0), Vector3(0.12, 2.7, 0.12), Color(0.16, 0.22, 0.23), false)
@@ -137,6 +144,20 @@ func _create_building(x: float, z: float, variant: int) -> void:
 func _create_street_lamp(x: float, z: float) -> void:
 	_add_box("Lamp post", Vector3(x, 2.0, z), Vector3(0.09, 4.0, 0.09), Color(0.12, 0.16, 0.16), false)
 	_add_box("Lamp head", Vector3(x, 4.0, z), Vector3(0.55, 0.18, 0.32), Color(0.84, 0.78, 0.58), false)
+
+func _create_street_bollard(x: float, z: float) -> void:
+	_add_box("Cast iron street bollard", Vector3(x, 0.48, z), Vector3(0.16, 0.88, 0.16), Color(0.12, 0.16, 0.16), false)
+	_add_box("Bollard cap", Vector3(x, 0.94, z), Vector3(0.22, 0.10, 0.22), Color(0.72, 0.62, 0.43), false)
+
+func _create_bench(position: Vector3) -> void:
+	_add_box("Bench seat", position + Vector3(0, 0.48, 0), Vector3(1.55, 0.12, 0.48), Color(0.34, 0.22, 0.13), false)
+	_add_box("Bench back", position + Vector3(0, 0.88, 0.20), Vector3(1.55, 0.62, 0.10), Color(0.39, 0.26, 0.16), false)
+	for side in [-0.58, 0.58]:
+		_add_box("Bench leg", position + Vector3(side, 0.23, 0), Vector3(0.10, 0.48, 0.10), Color(0.12, 0.15, 0.16), false)
+
+func _create_litter_bin(position: Vector3) -> void:
+	_add_box("Public litter bin", position + Vector3(0, 0.48, 0), Vector3(0.48, 0.92, 0.48), Color(0.16, 0.25, 0.23), false)
+	_add_box("Litter bin lid", position + Vector3(0, 0.96, 0), Vector3(0.54, 0.10, 0.54), Color(0.10, 0.15, 0.15), false)
 
 func _create_tree(position: Vector3) -> void:
 	var trunk := _add_box("Tree trunk", position + Vector3(0, 1.1, 0), Vector3(0.28, 2.2, 0.28), Color(0.30, 0.22, 0.16), false)
@@ -446,7 +467,7 @@ func _on_profile_confirmed(profile: Dictionary) -> void:
 		player.apply_profile(profile)
 	player_display_name = "%s %s" % [str(profile.get("first_name", "")), str(profile.get("last_name", ""))]
 	if is_instance_valid(hud_label):
-		hud_label.text = "%s  •  لندن ۲۰۱۸" % player_display_name
+		hud_label.text = "%s  •  لندن ۲۰۰۰" % player_display_name
 	character_creator = null
 
 func _create_exit_dialog() -> void:
