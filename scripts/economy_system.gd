@@ -63,6 +63,16 @@ func pay_rent() -> String:
 	economy_changed.emit()
 	return "اجاره هفتگی £90 پرداخت شد. خانه‌ات برای هفت روز دیگر تمدید شد."
 
+func pay_transport_fare() -> bool:
+	const FARE := 3.0
+	if money < FARE:
+		return false
+	money -= FARE
+	total_spent += FARE
+	_save_state()
+	economy_changed.emit()
+	return true
+
 func get_money_text() -> String:
 	return "£%.0f" % money
 
