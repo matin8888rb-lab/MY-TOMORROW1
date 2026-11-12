@@ -73,6 +73,15 @@ func pay_transport_fare() -> bool:
 	economy_changed.emit()
 	return true
 
+func spend_money(amount: float) -> bool:
+	if amount < 0.0 or money < amount:
+		return false
+	money -= amount
+	total_spent += amount
+	_save_state()
+	economy_changed.emit()
+	return true
+
 func get_money_text() -> String:
 	return "£%.0f" % money
 
